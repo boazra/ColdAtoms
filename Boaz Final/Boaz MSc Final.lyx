@@ -1,0 +1,136 @@
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+pagebreak
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+chapter{Introduction}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Cold atoms are a field of study, where atomic or molecular gasses at temperature
+s of nano to micro Kelvins are considered.
+ These systems, as well as being very interesting by themselves for the
+ use in quantum computation and quantum information, are also especially
+ interesting for the communities of condensed matter and high energy physics,
+ due to their ability to act as a simulator for computationally hard problems
+ in those fields.
+ The first experimental observation of a Bose-Einstein Condensation (BEC)
+ on 1995 [1,2], awarded a Nobel Prize on 2001.
+ Since then, many breakthrough experiments were done, including Superfluidity
+ [3], atomic clocks [4,5], BCS-BEC cross-over [6], Topological order and
+ quantum computation [7], Fractional quantum Hall states [8], Hubbard models
+ to serve as quantum simulators [9], as well as several other simulations
+ done with cold atoms in optical lattices [10,11].
+\end_layout
+
+\begin_layout Standard
+While nowadays it is relatively easy to cool down bosons to sub micro Kelvin
+ temperatures, the same is not largely true for fermions, because fermions
+ tend to stay away from each other due to Pauli Exclusion Principle.
+ Since fermions are important in some of the cold atoms experiments mentioned
+ above, as well as in fermionic superfluidity [12] and molecular BEC [13],
+ several techniques were developed in order to overcome the barrier for
+ making a Degenerate Fermi Gas (DFG).
+ Among the techniques one can find sympathetic cooling with a bosonic BEC
+ [14] and exploiting of Feshbach [15,16] resonances to increase fermions
+ interaction strength.
+\end_layout
+
+\end_body
+\end_document
