@@ -8,6 +8,7 @@ import loopfield.plot as lfp
 import numpy as np
 import matplotlib.pylab as plt
 import PyAstronomy.pyasl as pyasl
+import time
 
 
 # Constants
@@ -31,7 +32,7 @@ def Bias(Nz, Nr, I,y0):
     return field
         
 
-def Ioffe(Zmin4,Iq):
+def Ioffe(Zmin4,z0,Iq):
     
     fieldIoffe = lf.Field(length_units = lf.m, current_units = lf.A, field_units = lf.T)
 
@@ -52,7 +53,7 @@ def Ioffe(Zmin4,Iq):
     Nr4 = 2
     
     for R in  np.linspace(Rin0,Rin0+Sr0*(Nr4-1),Nr4):    
-        fieldIoffe.addLoop(lf.Loop([ coil_dx, coil_dy+ Zmin4, 0.], [0, 1, 0], R, Ii))    
+        fieldIoffe.addLoop(lf.Loop([ coil_dx, coil_dy+ Zmin4, z0], [0, 1, 0], R, Ii))    
     
     #3
     Zmin3 = Zmin4 + Sz0
@@ -61,7 +62,7 @@ def Ioffe(Zmin4,Iq):
     Nr3=4 #windings in radial direction
     
     for R in  np.linspace(Rin0,Rin0+Sr0*(Nr3-1),Nr3):    
-        fieldIoffe.addLoop(lf.Loop([ coil_dx, coil_dy+ Zmin3, 0.], [0, 1, 0], R, Ii))
+        fieldIoffe.addLoop(lf.Loop([ coil_dx, coil_dy+ Zmin3, z0], [0, 1, 0], R, Ii))
     
     #2
     Zmin2=Zmin3+Sz0 #coil axial distance
@@ -69,21 +70,21 @@ def Ioffe(Zmin4,Iq):
     Nr2=5 #windings in radial direction
 
     for R in np.linspace(Rin0,Rin0+Sr0*(Nr2-1),Nr2):     
-        fieldIoffe.addLoop(lf.Loop([ coil_dx,coil_dy+ Zmin2, 0.], [0, 1, 0], R, Ii))
-    
+        fieldIoffe.addLoop(lf.Loop([ coil_dx,coil_dy+ Zmin2, z0], [0, 1, 0], R, Ii))
+
     #1
     Zmin1=Zmin2+Sz0 #coil axial distance
     #Nz=1 #windings in axial direction 
     Nr1=6 #windings in radial direction
     
     for R in np.linspace(Rin0,Rin0+Sr0*(Nr1-1),Nr1):     
-        fieldIoffe.addLoop(lf.Loop([coil_dx,coil_dy+ Zmin1, 0.], [0, 1, 0], R, Ii))
+        fieldIoffe.addLoop(lf.Loop([coil_dx,coil_dy+ Zmin1,z0], [0, 1, 0], R, Ii))
     
     Zmin0=Zmin1+Sz0 #coil axial distance
     
     for R in np.linspace(Rin0,Rin0+Sr0*(Nr0-1),Nr0): 
         for dz in np.linspace(0,Sz0*(Nz0-1),Nz0):
-            fieldIoffe.addLoop(lf.Loop([ coil_dx,coil_dy+ Zmin0+dz, 0.], [0, 1, 0], R, Ii))
+            fieldIoffe.addLoop(lf.Loop([ coil_dx,coil_dy+ Zmin0+dz, z0], [0, 1, 0], R, Ii))
     
     return fieldIoffe
 
@@ -94,11 +95,11 @@ field = lf.Field(length_units = lf.m,
 
 Sr = 1.25e-3       # radial spacing of windings
 Sz = 2.5e-3     # axial spacing of windings
-Rin = 75.0e-3     # inner radius
-Zmin = 0#37.0e-3/2.0 # lower coil axial distance 14
-Nz = 80          # windings in axial direction - 4
-Nr = 5         # windings in radial direction - 6
-Iq = 100.0         # Quad current - Ampere
+Rin = 12.5e-3     # inner radius
+Zmin = 37.0e-3/2.0 # lower coil axial distance 14
+Nz = 4          # windings in axial direction - 4
+Nr = 26         # windings in radial direction - 6
+Iq = 30.0         # Quad current - Ampere
 
 for R in np.linspace(Rin,Rin+Sr*(Nr-1),Nr):
     for dz in np.linspace(0,Sz*(Nz-1),Nz):
@@ -107,60 +108,73 @@ for R in np.linspace(Rin,Rin+Sr*(Nr-1),Nr):
 
 Ibias = 3.5
 BiasField = Bias(2,5,Ibias,0.0)
-num_points = 151
+num_points = 81
 #X_Axis = np.linspace(-Zmin*2, Zmin*2, num_points)
-Y_Axis = np.linspace(-20e-3,20e-3, num_points)
+Y_Axis = np.linspace(-15e-3,15e-3, num_points)
 #X_Field = np.array([field.evaluate([x, 0., 0.]) for x in X_Axis])
-Y_Field = np.array([field.evaluate([0., y, 0.]) for y in Y_Axis])
-
-Y_Field_Bias = np.array([BiasField.evaluate([0., y, 0.]) for y in Y_Axis]) 
-
+Y_Field = np.reshape(np.array([field.evaluate([x, y,z]) for x in Y_Axis for y in Y_Axis[40:] for z in Y_Axis]),(num_points,num_points,num_points,3))
+fieldIoffe = Ioffe(0,0,Iq)
+Ioffe_vals = np.array([fieldIoffe.evaluate([x,y,z]) for x in np.linspace(-15e-3,15e-3,81) for y in np.linspace(0,30e-3,81) for z in range(95)*dz -15e-3])
+Ioffe_vals = np.reshape(Ioffe_vals,(81,81,95,3))
 font = {'family' : 'DejaVu Sans',        
         'size'   : 26}
 plt.rc('font', **font)
 
-count = 0
-for y0 in np.linspace(0.5e-3,20e-3,40):
-    fieldIoffe = Ioffe(y0,Iq)
-    
-    # evaluate field at center of coil
+
+fieldmap = list()
+#count = 0
+#total = 11*5
+#t= time.time()
+print("start running")
+for z0 in range(15):
+    fieldmap.append([])
+    for y0 in range(40):
+        #fieldIoffe = Ioffe(y0,z0,Iq)
+            
+        YIoffe_Field = Ioffe_vals[:,y0:y0+41,z0:z0+81] 
+        sumField = 1e4*(YIoffe_Field+Y_Field)
+        fieldmap[-1].append(sumField)
+        count +=1
+        dt = time.time()-t
+        print("finished run number {0} out of {1} in {2:05.2f} sec. left {3:05.2f} sec.".format(count,total,dt,dt/count*(total-count)))           
         
-    
-    #    XIoffe_Field = np.array([fieldIoffe.evaluate([x, 0., 0.]) for x in X_Axis])
-    #    plt.figure('X Axis')
-    #    plt.plot(X_Axis, 1e4*np.linalg.norm(X_Field,axis = 1))
-    #    plt.plot(X_Axis, 1e4*np.linalg.norm(XIoffe_Field,axis = 1))
-    #    plt.plot(X_Axis, 1e4*np.linalg.norm(XIoffe_Field+X_Field, axis =1))
-    #    plt.title('Abs Value of magnetic field VS distance along X Axis')
-    #    plt.xlabel('X Dist(mm)')
-    #    plt.ylabel('Abs Magnetic Field(Gauss)')
-    #    plt.legend(['Helmholtz', 'Ioffe', 'Sum'])
-           
-    YIoffe_Field = np.array([fieldIoffe.evaluate([0., y, 0.]) for y in Y_Axis])
-    
-    sumField = 1e4*np.linalg.norm(YIoffe_Field+Y_Field+Y_Field_Bias, axis =1)
-    plt.close('all')
-    plt.figure('Y Axis',(20,10))
-    plt.plot(Y_Axis*1e3, 1e4*np.linalg.norm(Y_Field,axis = 1))
-    plt.plot(Y_Axis*1e3, 1e4*np.linalg.norm(YIoffe_Field,axis = 1))
-    plt.plot(Y_Axis*1e3, sumField)
-    plt.plot(Y_Axis*1e3, 1e4*np.linalg.norm(Y_Field_Bias, axis=1), 'k')
-    plt.title('Abs Value of magnetic field VS distance along Y Axis. Ioffe @ {0:.2f}(mm)'.format(y0*1e3))
-    plt.xlabel('Y Dist(mm)')
-    plt.ylabel('Abs Magnetic Field(Gauss)')    
-    plt.annotate('min({:.2f},{:.2f})'.format(Y_Axis[sumField.argmin()]*1e3,sumField.min()),
-                 (Y_Axis[sumField.argmin()]*1e3,sumField.min()+1.3*abs(Iq)), fontsize = '14')
-    epos, mi, xb, yb, p = pyasl.quadExtreme(Y_Axis*1e3, sumField,'min',dp=((2,1)), fullOutput=True)    
-    plt.plot(Y_Axis*1.0e3,quadFit(Y_Axis*1.0e3,p,Y_Axis[mi]*1.0e3))
-    plt.legend(['Helmholtz', 'Ioffe', 'Sum', 'Bias Field', 'Quad Fit'],loc = 2)
-    plt.ylim([0,1e4*np.linalg.norm(Y_Field,axis = 1).max()*1.05])
-    gamma = np.sqrt(p[0]/MagneticDipoleK*2)*1e3
-    plt.annotate('freq = {:.2f}Hz'.format(gamma),(Y_Axis[sumField.argmin()]*1e3,sumField.min()+2.5*abs(Iq)), fontsize = '14')    
-    plt.savefig('Y Axis images\dy{:05.2f}mm.jpg'.format(y0*1.0e3))
-    count +=1
-    print("Finished coil #{:02d} @ y = {:05.2f}(mm).".format(count, y0*1.0e3))
+        '''
+        plt.close('all')
+        plt.figure('Y Axis',(20,10))
+        plt.plot(Y_Axis*1e3, 1e4*np.linalg.norm(Y_Field,axis = 1))
+        plt.plot(Y_Axis*1e3, 1e4*np.linalg.norm(YIoffe_Field,axis = 1))
+        plt.plot(Y_Axis*1e3, sumField)
+        plt.plot(Y_Axis*1e3, 1e4*np.linalg.norm(Y_Field_Bias, axis=1), 'k')
+        plt.title('Abs Value of magnetic field VS distance along Y Axis. Ioffe @ {0:.2f}(mm)'.format(y0*1e3))
+        plt.xlabel('Y Dist(mm)')
+        plt.ylabel('Abs Magnetic Field(Gauss)')    
+        plt.annotate('min({:.2f},{:.2f})'.format(Y_Axis[sumField.argmin()]*1e3,sumField.min()),
+                     (Y_Axis[sumField.argmin()]*1e3,sumField.min()+1.3*abs(Iq)), fontsize = '14')
+        epos, mi, xb, yb, p = pyasl.quadExtreme(Y_Axis*1e3, sumField,'min',dp=((2,1)), fullOutput=True)    
+        plt.plot(Y_Axis*1.0e3,quadFit(Y_Axis*1.0e3,p,Y_Axis[mi]*1.0e3))
+        plt.legend(['Helmholtz', 'Ioffe', 'Sum', 'Bias Field', 'Quad Fit'],loc = 2)
+        plt.ylim([0,1e4*np.linalg.norm(Y_Field,axis = 1).max()*1.05])
+        gamma = np.sqrt(p[0]/MagneticDipoleK*2)*1e3
+        plt.annotate('freq = {:.2f}Hz'.format(gamma),(Y_Axis[sumField.argmin()]*1e3,sumField.min()+2.5*abs(Iq)), fontsize = '14')    
+        plt.savefig('Y Axis images\dy{:05.2f}mm.jpg'.format(y0*1.0e3))
+        count +=1
+        print("Finished coil #{:02d} @ y = {:05.2f}(mm).".format(count, y0*1.0e3))
+        '''
 
 '''
+# evaluate field at center of coil 
+    
+
+#    XIoffe_Field = np.array([fieldIoffe.evaluate([x, 0., 0.]) for x in X_Axis])
+#    plt.figure('X Axis')
+#    plt.plot(X_Axis, 1e4*np.linalg.norm(X_Field,axis = 1))
+#    plt.plot(X_Axis, 1e4*np.linalg.norm(XIoffe_Field,axis = 1))
+#    plt.plot(X_Axis, 1e4*np.linalg.norm(XIoffe_Field+X_Field, axis =1))
+#    plt.title('Abs Value of magnetic field VS distance along X Axis')
+#    plt.xlabel('X Dist(mm)')
+#    plt.ylabel('Abs Magnetic Field(Gauss)')
+#    plt.legend(['Helmholtz', 'Ioffe', 'Sum'])
+
 print('Calculating plot...')
 # function returns ratio of x-component to that at coil center
 def x_ratio(B):
